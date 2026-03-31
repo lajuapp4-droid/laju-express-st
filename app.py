@@ -10,7 +10,7 @@ st.set_page_config(page_title="Laju Express", page_icon="📦", layout="centered
 
 # Koneksi ke Google Sheets
 # Nanti URL ini diganti sama URL Google Sheets kamu yang udah di-share public/editor
-GSHEETS_URL = "https://docs.google.com/spreadsheets/d/1mqAYhGEDgw6Fiu2yHUug16QXrzJO-7Jgr1Z4UTt0DOM/edit?usp=sharing"
+GSHEETS_URL = "https://docs.google.com/spreadsheets/d/1mqAYhGEDgw6Fiu2yHUug16QXrzJO-7Jgr1Z4UTt0DOM/edit"
 
 @st.cache_resource(ttl=10)
 def load_data(sheet_name):
