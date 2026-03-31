@@ -9,22 +9,27 @@
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <style>
-        /* Sembunyikan div saat di-print */
-        @media print { body * { visibility: hidden; } #printArea, #printArea * { visibility: visible; } #printArea { position: absolute; left: 0; top: 0; width: 100%; } }
+        /* Sembunyikan elemen lain saat nge-print resi */
+        @media print { 
+            body * { visibility: hidden; } 
+            #printArea, #printArea * { visibility: visible; } 
+            #printArea { position: absolute; left: 0; top: 0; width: 100%; } 
+        }
         .hidden { display: none !important; }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans">
 
     <nav class="bg-blue-800 text-white p-4 flex justify-between items-center shadow-md">
-        <h1 class="text-xl font-bold italic">LAJU EXPRESS</h1>
+        <h1 class="text-xl font-bold italic tracking-wider">LAJU EXPRESS</h1>
         <div id="navRight">
-            <button id="btnLogin" onclick="showPage('loginPage')" class="bg-white text-blue-800 px-3 py-1 rounded font-bold">Login Karyawan</button>
-            <button id="btnLogout" onclick="logout()" class="hidden bg-red-500 px-3 py-1 rounded font-bold">Logout</button>
+            <button id="btnLogin" onclick="showPage('loginPage')" class="bg-white text-blue-800 px-4 py-1 rounded font-bold hover:bg-gray-200 shadow">Login Karyawan</button>
+            <button id="btnLogout" onclick="logout()" class="hidden bg-red-500 hover:bg-red-600 px-4 py-1 rounded font-bold shadow text-white">Logout</button>
         </div>
     </nav>
 
     <script>
+        // URL API SUDAH DIMASUKKAN OTOMATIS
         const API_URL = "https://script.google.com/macros/s/AKfycbyA1EJpnyq-5cruPekt8wVfSqdnfFVoswH4tiCyxPszeYDWFfB56xFfOnzZT1JRM2AK4Q/exec";
         let userSesi = null;
         let fotoBase64Global = null;
@@ -32,153 +37,254 @@
     </script>
 
     <div id="trackingPage" class="container mx-auto mt-10 p-4 max-w-md">
-        <div class="bg-white p-6 rounded-lg shadow-lg text-center">
-            <h2 class="text-2xl font-bold mb-4">Lacak Paket</h2>
-            <input type="text" id="resiTrack" placeholder="Masukkan Resi (LAJU-...)" class="w-full border-2 p-3 rounded mb-4 text-center font-bold uppercase">
-            <button onclick="cekResi()" class="w-full bg-orange-500 text-white font-bold py-3 rounded">CEK RESI</button>
-            <div id="resultTrack" class="mt-6 hidden text-left bg-gray-50 p-4 rounded border">
-                <p class="text-sm text-gray-500">Rute & Penerima:</p>
-                <p id="t_rute" class="font-bold">-</p>
-                <p id="t_penerima" class="font-bold mb-2">-</p>
-                <span id="t_badge" class="px-3 py-1 text-white font-bold rounded">STATUS</span>
-                <p class="text-sm mt-3">📦 Posisi: <span id="t_posisi" class="font-bold"></span></p>
+        <div class="bg-white p-6 rounded-lg shadow-lg text-center border-t-4 border-orange-500">
+            <h2 class="text-2xl font-bold mb-4">Lacak Paket Kamu</h2>
+            <input type="text" id="resiTrack" placeholder="Masukkan Resi (LAJU-...)" class="w-full border-2 border-gray-300 p-3 rounded mb-4 text-center font-bold uppercase focus:border-orange-500 focus:outline-none">
+            <button id="btnLacak" onclick="cekResi()" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded shadow-md transition-all">CEK RESI</button>
+            
+            <div id="resultTrack" class="mt-6 hidden text-left bg-gray-50 p-4 rounded-lg border border-gray-200 shadow-inner">
+                <p class="text-xs text-gray-500 uppercase tracking-wider font-bold mb-1">Rute Pengiriman:</p>
+                <p id="t_rute" class="font-bold text-gray-800 mb-1">-</p>
+                <p id="t_penerima" class="font-bold text-gray-600 mb-3 text-sm">-</p>
+                <span id="t_badge" class="px-3 py-1 text-white font-bold rounded-full text-sm shadow">STATUS</span>
+                <div class="mt-4 pt-3 border-t border-gray-200">
+                    <p class="text-sm text-gray-600">📍 Posisi Terkini:</p>
+                    <p id="t_posisi" class="font-bold text-blue-800"></p>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="loginPage" class="container mx-auto mt-10 p-4 max-w-md hidden">
-        <div class="bg-white p-6 rounded shadow">
-            <h2 class="text-2xl font-bold mb-4 text-center">Portal Karyawan</h2>
-            <input type="text" id="l_user" placeholder="Username" class="w-full border p-2 mb-3 rounded">
-            <input type="password" id="l_pass" placeholder="Password" class="w-full border p-2 mb-4 rounded">
-            <button id="btnProsesLogin" onclick="login()" class="w-full bg-blue-600 text-white font-bold py-2 rounded">Masuk</button>
+        <div class="bg-white p-8 rounded-lg shadow-lg border-t-4 border-blue-600">
+            <h2 class="text-2xl font-bold mb-6 text-center text-blue-800">Portal Karyawan</h2>
+            <input type="text" id="l_user" placeholder="Username" class="w-full border-2 p-3 mb-4 rounded bg-gray-50 focus:bg-white focus:border-blue-500 outline-none">
+            <input type="password" id="l_pass" placeholder="Password" class="w-full border-2 p-3 mb-6 rounded bg-gray-50 focus:bg-white focus:border-blue-500 outline-none">
+            <button id="btnProsesLogin" onclick="login()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded shadow-md transition-all">Log In</button>
+            <button onclick="showPage('trackingPage')" class="w-full text-center mt-4 text-blue-500 text-sm underline">Kembali ke halaman Lacak</button>
         </div>
     </div>
 
-    <div id="dashboardPage" class="container mx-auto mt-4 p-4 hidden">
-        <div class="bg-white p-4 rounded shadow mb-4 border-l-4 border-blue-500">
-            <h2 class="text-xl font-bold" id="dashName">Nama User</h2>
-            <p class="text-sm text-gray-600" id="dashInfo">Role | Cabang</p>
+    <div id="dashboardPage" class="container mx-auto mt-6 p-4 hidden max-w-4xl">
+        <div class="bg-white p-5 rounded-lg shadow-md mb-6 border-l-8 border-blue-600 flex justify-between items-center">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800" id="dashName">Nama User</h2>
+                <p class="text-sm text-gray-600 bg-gray-100 inline-block px-2 py-1 rounded mt-1 font-mono" id="dashInfo">Role | Cabang</p>
+            </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <button id="menuInput" onclick="showMenu('formInput')" class="hidden bg-white p-6 rounded shadow border-t-4 border-green-500 text-left">
-                <h3 class="font-bold text-lg">📝 Input Resi (Multi-Step)</h3>
-                <p class="text-sm text-gray-500">Buat resi dengan Smart Pricing & Bukti Foto</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <button id="menuInput" onclick="showMenu('formInput')" class="hidden bg-white p-6 rounded-lg shadow hover:shadow-xl transition-all border-t-4 border-green-500 text-left group">
+                <div class="text-4xl mb-3">📝</div>
+                <h3 class="font-bold text-xl text-gray-800 group-hover:text-green-600 transition-colors">Input Resi Baru</h3>
+                <p class="text-sm text-gray-500 mt-2">Buat resi pengiriman, hitung ongkir otomatis & upload bukti foto barang.</p>
             </button>
             
-            <button id="menuTransit" onclick="showMenu('formTransit')" class="hidden bg-white p-6 rounded shadow border-t-4 border-orange-500 text-left">
-                <h3 class="font-bold text-lg">📸 Transit & POD</h3>
-                <p class="text-sm text-gray-500">Scan Barcode untuk update posisi paket</p>
+            <button id="menuTransit" onclick="showMenu('formTransit')" class="hidden bg-white p-6 rounded-lg shadow hover:shadow-xl transition-all border-t-4 border-orange-500 text-left group">
+                <div class="text-4xl mb-3">📸</div>
+                <h3 class="font-bold text-xl text-gray-800 group-hover:text-orange-600 transition-colors">Update Transit & POD</h3>
+                <p class="text-sm text-gray-500 mt-2">Scan Barcode / ketik nomor resi untuk update posisi paket ke cabang ini.</p>
             </button>
         </div>
     </div>
 
-    <div id="formInput" class="container mx-auto mt-4 p-4 hidden max-w-2xl">
-        <button onclick="showMenu('none')" class="text-blue-500 mb-4 underline">< Kembali ke Dashboard</button>
+    <div id="formTransit" class="container mx-auto mt-6 p-4 hidden max-w-md">
+        <button onclick="showMenu('none')" class="text-blue-600 font-bold mb-4 hover:underline">← Kembali ke Dashboard</button>
+        <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-orange-500">
+            <h3 class="font-bold text-xl mb-4 text-gray-800">Update Posisi Paket</h3>
+            <p class="text-sm text-gray-500 mb-4">Masukkan nomor resi manual atau gunakan alat scanner.</p>
+            
+            <input type="text" id="i_resiUpdate" placeholder="Scan/Ketik LAJU-..." class="w-full border-2 border-gray-300 p-3 rounded mb-4 font-bold uppercase text-center focus:border-orange-500 outline-none">
+            
+            <label class="block text-sm font-bold text-gray-700 mb-2">Ubah Status Menjadi:</label>
+            <select id="i_statusUpdate" class="w-full border-2 p-3 rounded mb-6 bg-gray-50 font-bold">
+                <option value="ON TRANSIT">🟡 ON TRANSIT (Paket Tiba di Cabang)</option>
+                <option value="DELIVERED">🟢 DELIVERED (Paket Diterima Customer)</option>
+            </select>
+            
+            <button id="btnUpdateResi" onclick="updateResi()" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded shadow">UPDATE SYSTEM</button>
+        </div>
+    </div>
+
+    <div id="formInput" class="container mx-auto mt-6 p-4 hidden max-w-2xl">
+        <button onclick="showMenu('none')" class="text-blue-600 font-bold mb-4 hover:underline">← Kembali ke Dashboard</button>
         
-        <div id="step1" class="bg-white p-6 rounded shadow">
-            <h3 class="font-bold text-lg border-b pb-2 mb-4">Step 1: Data & Volume Barang</h3>
-            <input type="text" id="i_pengirim" placeholder="Nama Pengirim" class="w-full border p-2 mb-2">
-            <input type="text" id="i_penerima" placeholder="Nama Penerima" class="w-full border p-2 mb-2">
-            <select id="i_zona" class="w-full border p-2 mb-2">
-                <option value="8000">Satu Kota (Rp 8k)</option>
-                <option value="12000">Satu Provinsi (Rp 12k)</option>
-                <option value="20000">Sesama Jawa (Rp 20k)</option>
-                <option value="45000">Lintas Pulau (Rp 45k)</option>
-            </select>
-            <input type="number" id="i_berat" placeholder="Berat (Kg)" class="w-full border p-2 mb-2">
+        <div id="step1" class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-green-500">
+            <h3 class="font-bold text-xl text-gray-800 border-b-2 border-gray-100 pb-3 mb-5">Step 1: Data Pengiriman</h3>
             
-            <div class="flex gap-2 mb-2">
-                <input type="number" id="i_p" placeholder="P(cm)" class="w-1/3 border p-2">
-                <input type="number" id="i_l" placeholder="L(cm)" class="w-1/3 border p-2">
-                <input type="number" id="i_t" placeholder="T(cm)" class="w-1/3 border p-2">
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Pengirim</label>
+                    <input type="text" id="i_pengirim" placeholder="Nama Pengirim" class="w-full border p-2 rounded bg-gray-50 focus:bg-white outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Penerima</label>
+                    <input type="text" id="i_penerima" placeholder="Nama Penerima" class="w-full border p-2 rounded bg-gray-50 focus:bg-white outline-none">
+                </div>
             </div>
 
-            <select id="i_kategori" onchange="cekAsuransi()" class="w-full border p-2 mb-2">
-                <option value="Umum">Barang Umum</option>
-                <option value="Pecah Belah">Pecah Belah (+Rp 5k)</option>
-                <option value="Elektronik">Elektronik (+Rp 10k & Wajib Asuransi)</option>
-                <option value="Makanan">Makanan (+Rp 3k)</option>
+            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Zonasi Tujuan</label>
+            <select id="i_zona" class="w-full border p-2 rounded mb-4 bg-gray-50">
+                <option value="8000">Satu Kota (Base: Rp 8.000/kg)</option>
+                <option value="12000">Satu Provinsi (Base: Rp 12.000/kg)</option>
+                <option value="20000">Sesama Pulau Jawa (Base: Rp 20.000/kg)</option>
+                <option value="45000">Lintas Pulau (Base: Rp 45.000/kg)</option>
             </select>
-
-            <label class="block text-sm font-bold mt-4">📸 Foto Barang (Maks 1MB):</label>
-            <input type="file" accept="image/*" capture="environment" id="i_foto" onchange="kompresFoto(event)" class="w-full border p-2 mb-4">
             
-            <button onclick="lanjutStep2()" class="w-full bg-blue-600 text-white font-bold py-2 rounded">Lanjut Pembayaran ></button>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Berat (Kg)</label>
+                    <input type="number" id="i_berat" placeholder="Contoh: 2" min="1" class="w-full border p-2 rounded bg-gray-50 focus:bg-white outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Kategori Barang</label>
+                    <select id="i_kategori" onchange="cekAsuransi()" class="w-full border p-2 rounded bg-gray-50">
+                        <option value="Umum">Barang Umum (Standar)</option>
+                        <option value="Pecah Belah">Pecah Belah (+Rp 5.000)</option>
+                        <option value="Elektronik">Elektronik (+Rp 10.000 & Wajib Asuransi)</option>
+                        <option value="Makanan">Makanan/Frozen (+Rp 3.000)</option>
+                    </select>
+                </div>
+            </div>
+
+            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Dimensi Volume (cm)</label>
+            <div class="flex gap-2 mb-4">
+                <input type="number" id="i_p" placeholder="Panjang" min="1" class="w-1/3 border p-2 rounded text-center bg-gray-50">
+                <input type="number" id="i_l" placeholder="Lebar" min="1" class="w-1/3 border p-2 rounded text-center bg-gray-50">
+                <input type="number" id="i_t" placeholder="Tinggi" min="1" class="w-1/3 border p-2 rounded text-center bg-gray-50">
+            </div>
+
+            <div class="bg-blue-50 p-4 rounded-lg mb-6 border border-blue-100">
+                <label class="block text-sm font-bold text-blue-800 mb-2">📸 Foto Barang (Bukti Kondisi Awal):</label>
+                <p class="text-xs text-gray-500 mb-2">Foto akan otomatis dikompres menjadi maksimal 1MB.</p>
+                <input type="file" accept="image/*" capture="environment" id="i_foto" onchange="kompresFoto(event)" class="w-full text-sm">
+            </div>
+            
+            <button onclick="lanjutStep2()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded shadow">Lanjut ke Pembayaran & Layanan →</button>
         </div>
 
-        <div id="step2" class="bg-white p-6 rounded shadow hidden">
-            <h3 class="font-bold text-lg border-b pb-2 mb-4">Step 2: Layanan & Pembayaran</h3>
-            <select id="i_layanan" class="w-full border p-2 mb-2">
-                <option value="1">Reguler (1x)</option>
-                <option value="1.5">Sameday (1.5x)</option>
-                <option value="2">Instant (2x)</option>
-                <option value="0.65">Cargo (0.65x - Min 10kg)</option>
+        <div id="step2" class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-blue-600 hidden">
+            <h3 class="font-bold text-xl text-gray-800 border-b-2 border-gray-100 pb-3 mb-5">Step 2: Layanan & Pembayaran</h3>
+            
+            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Pilih Layanan</label>
+            <select id="i_layanan" class="w-full border p-3 rounded mb-4 font-bold bg-gray-50 text-blue-800">
+                <option value="1">REGULER (Harga Normal)</option>
+                <option value="1.5">SAMEDAY (Harga 1.5x Lipat)</option>
+                <option value="2">INSTANT (Harga 2x Lipat)</option>
+                <option value="0.65">CARGO (Harga 0.65x - Syarat Min. 10 Kg)</option>
             </select>
             
-            <div class="mb-4">
-                <label class="flex items-center"><input type="checkbox" id="chk_asuransi" onchange="toggleHargaBarang()" class="mr-2"> 🛡️ Tambah Asuransi (0.5%)</label>
-                <input type="number" id="i_hargaBarang" placeholder="Nilai Harga Barang (Rp)" class="w-full border p-2 mt-2 hidden">
+            <div class="bg-gray-50 p-4 rounded border mb-4">
+                <label class="flex items-center font-bold text-gray-700 cursor-pointer">
+                    <input type="checkbox" id="chk_asuransi" onchange="toggleHargaBarang()" class="mr-3 w-5 h-5"> 
+                    🛡️ Tambahkan Proteksi / Asuransi (Premi 0.5%)
+                </label>
+                <div id="div_hargaBarang" class="mt-3 hidden transition-all">
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nilai Harga Barang Aktual (Rp)</label>
+                    <input type="number" id="i_hargaBarang" placeholder="Contoh: 1500000" class="w-full border p-2 rounded">
+                </div>
             </div>
 
-            <select id="i_bayar" onchange="togglePrepaid()" class="w-full border p-2 mb-4 font-bold bg-gray-50">
-                <option value="PREPAID">Prepaid (Cash/Transfer)</option>
-                <option value="COD">COD (Bayar di Tujuan +Rp 5k)</option>
+            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Metode Pembayaran</label>
+            <select id="i_bayar" onchange="togglePrepaid()" class="w-full border-2 border-gray-300 p-3 rounded mb-6 font-bold bg-white focus:border-blue-500 outline-none">
+                <option value="PREPAID">💳 PREPAID (Lunas / Transfer / Cash di Agen)</option>
+                <option value="COD">💵 COD (Bayar di Tujuan + Surcharge Rp 5.000)</option>
             </select>
 
-            <button onclick="hitungTotal()" class="w-full bg-green-500 text-white font-bold py-2 mb-2 rounded">Hitung Estimasi</button>
-            <div id="rincianBiaya" class="bg-yellow-100 p-3 rounded mb-4 text-sm hidden"></div>
-
-            <label id="lbl_prepaid" class="flex items-center text-red-600 font-bold mb-4"><input type="checkbox" id="chk_lunas" class="mr-2"> ✅ Saya sudah terima uang dari pengirim.</label>
+            <button onclick="hitungTotal()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 mb-4 rounded shadow">HITUNG TOTAL ONGKIR</button>
             
-            <button id="btnProsesResi" onclick="prosesResi()" class="w-full bg-blue-800 text-white font-bold py-3 rounded">PROSES RESI & CETAK</button>
+            <div id="rincianBiaya" class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded mb-6 text-sm hidden">
+                </div>
+
+            <div id="div_lunas" class="bg-red-50 p-4 border border-red-200 rounded mb-6">
+                <label id="lbl_prepaid" class="flex items-start text-red-700 font-bold cursor-pointer">
+                    <input type="checkbox" id="chk_lunas" class="mr-3 mt-1 w-5 h-5"> 
+                    <span>⚠️ WAJIB CENTANG: Saya selaku Admin mengkonfirmasi bahwa uang ongkir PREPAID telah diterima lunas.</span>
+                </label>
+            </div>
+            
+            <div class="flex gap-2">
+                <button onclick="kembaliStep1()" class="w-1/3 bg-gray-200 text-gray-700 font-bold py-3 rounded">Kembali</button>
+                <button id="btnProsesResi" onclick="prosesResi()" class="w-2/3 bg-blue-800 hover:bg-blue-900 text-white font-bold py-3 rounded shadow-lg">PROSES RESI SEKARANG</button>
+            </div>
         </div>
     </div>
 
-    <div id="printArea" class="hidden bg-white p-8 w-full max-w-md mx-auto border-2 border-black">
-        <h1 class="text-3xl font-black italic text-center border-b-4 border-black pb-2 mb-4">LAJU EXPRESS</h1>
-        <div class="flex justify-center mb-4"><svg id="barcode"></svg></div>
-        <p class="font-bold text-xl mb-2">PENGIRIM: <span id="p_pengirim"></span></p>
-        <p class="font-bold text-xl mb-4">PENERIMA: <span id="p_penerima"></span></p>
-        <div class="border-t-2 border-black pt-2 flex justify-between font-bold">
-            <p>Layanan: <span id="p_layanan"></span></p>
-            <p>Berat: <span id="p_berat"></span> Kg</p>
+    <div id="printArea" class="hidden bg-white p-6 w-full max-w-sm mx-auto border-4 border-black font-sans text-black">
+        <h1 class="text-3xl font-black italic text-center border-b-4 border-black pb-2 mb-4 tracking-tighter">LAJU EXPRESS</h1>
+        <div class="flex justify-center mb-2"><svg id="barcode"></svg></div>
+        <p class="text-center font-bold text-sm mb-4" id="p_resiText"></p>
+        
+        <div class="mb-4">
+            <p class="text-xs font-bold uppercase text-gray-600">PENGIRIM:</p>
+            <p class="font-black text-xl leading-tight" id="p_pengirim"></p>
         </div>
-        <h2 id="p_tagih" class="text-center text-2xl font-black mt-6 border-4 border-black py-2"></h2>
-        <button onclick="window.print()" class="mt-8 w-full bg-blue-500 text-white py-2 rounded no-print">🖨️ KLIK UNTUK PRINT</button>
-        <button onclick="location.reload()" class="mt-2 w-full text-blue-500 underline no-print">Tutup</button>
+        <div class="mb-4">
+            <p class="text-xs font-bold uppercase text-gray-600">PENERIMA:</p>
+            <p class="font-black text-xl leading-tight" id="p_penerima"></p>
+        </div>
+        
+        <div class="border-t-4 border-b-4 border-black py-2 my-4 flex justify-between items-center font-bold">
+            <div>
+                <p class="text-xs uppercase">Layanan</p>
+                <p class="text-lg" id="p_layanan"></p>
+            </div>
+            <div class="text-right">
+                <p class="text-xs uppercase">Berat Total</p>
+                <p class="text-lg"><span id="p_berat"></span> KG</p>
+            </div>
+        </div>
+        
+        <div id="p_tagih_container" class="text-center p-3 border-4 border-black mt-4">
+            <p class="text-sm font-bold uppercase mb-1" id="p_tagih_label">STATUS PEMBAYARAN</p>
+            <h2 id="p_tagih" class="text-2xl font-black"></h2>
+        </div>
+        
+        <p class="text-center text-xs mt-6 font-bold">* Resi ini digenerate secara sistem.</p>
+
+        <button onclick="window.print()" class="mt-8 w-full bg-gray-800 text-white font-bold py-3 rounded no-print">🖨️ KLIK UNTUK PRINT RESI</button>
+        <button onclick="location.reload()" class="mt-3 w-full text-blue-600 font-bold underline text-sm no-print">Tutup & Buat Resi Baru</button>
     </div>
 
     <script>
+        // --- NAVIGASI UI ---
         function showPage(page) {
-            ['trackingPage', 'loginPage', 'dashboardPage', 'formInput'].forEach(p => document.getElementById(p).classList.add('hidden'));
+            ['trackingPage', 'loginPage', 'dashboardPage', 'formInput', 'formTransit'].forEach(p => document.getElementById(p).classList.add('hidden'));
             if(page !== 'none') document.getElementById(page).classList.remove('hidden');
+            
             document.getElementById('btnLogin').classList.toggle('hidden', page === 'dashboardPage' || userSesi !== null);
             document.getElementById('btnLogout').classList.toggle('hidden', userSesi === null);
         }
 
         function showMenu(menu) {
-            ['formInput'].forEach(p => document.getElementById(p).classList.add('hidden'));
+            ['formInput', 'formTransit'].forEach(p => document.getElementById(p).classList.add('hidden'));
             if(menu !== 'none') document.getElementById(menu).classList.remove('hidden');
             if(menu === 'none') showPage('dashboardPage');
         }
 
-        // --- AUTH & RBAC ---
+        // --- AUTENTIKASI ---
         async function login() {
             let u = document.getElementById('l_user').value;
             let p = document.getElementById('l_pass').value;
-            document.getElementById('btnProsesLogin').innerText = "Loading...";
+            let btn = document.getElementById('btnProsesLogin');
+            if(!u || !p) return alert("Username dan Password wajib diisi!");
+            
+            btn.innerText = "Memverifikasi..."; btn.disabled = true;
             
             try {
-                let res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'login', username: u, password: p }) });
+                // TAMBAHAN ANTI BLOCK (CORS HEADERS)
+                let res = await fetch(API_URL, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'login', username: u, password: p }) 
+                });
                 let data = await res.json();
+                
                 if(data.success) {
                     userSesi = data.data;
                     document.getElementById('dashName').innerText = `Halo, ${userSesi.nama}!`;
-                    document.getElementById('dashInfo').innerText = `${userSesi.role} | ${userSesi.cabang}`;
+                    document.getElementById('dashInfo').innerText = `Role: ${userSesi.role} | Lokasi: ${userSesi.cabang}`;
                     
-                    // RBAC Dinamis
                     let role = userSesi.role.toUpperCase();
                     if(role === 'ADMIN') {
                         document.getElementById('menuInput').classList.remove('hidden');
@@ -188,39 +294,120 @@
                         document.getElementById('menuTransit').classList.remove('hidden');
                         showPage('dashboardPage');
                     } else {
-                        alert("Customer diarahkan ke Tracking.");
+                        alert("Berhasil login. Customer diarahkan ke Lacak Paket.");
                         showPage('trackingPage');
                     }
                 } else alert(data.message);
-            } catch(e) { alert("Gagal konek server."); }
-            document.getElementById('btnProsesLogin').innerText = "Masuk";
+            } catch(e) { alert("Gagal koneksi ke server. Pastikan URL API sudah benar."); }
+            
+            btn.innerText = "Log In"; btn.disabled = false;
         }
 
         async function logout() {
-            if(userSesi) {
-                await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'logout', nama: userSesi.nama }) });
-                userSesi = null;
-                showPage('trackingPage');
-            }
+            if(!userSesi) return;
+            try {
+                await fetch(API_URL, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'logout', nama: userSesi.nama }) 
+                });
+            } catch(e) {} // Abaikan error saat logout
+            userSesi = null;
+            showPage('trackingPage');
         }
 
-        // --- SMART PRICING & LOGIKA FORM ---
+        // --- PUBLIC TRACKING ---
+        async function cekResi() {
+            let resi = document.getElementById('resiTrack').value.toUpperCase();
+            let btn = document.getElementById('btnLacak');
+            if(!resi) return alert("Masukkan nomor resi dulu!");
+            
+            btn.innerText = "Mencari..."; btn.disabled = true;
+            
+            try {
+                let res = await fetch(API_URL, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'lacak', resi: resi }) 
+                });
+                let data = await res.json();
+                
+                if(data.success) {
+                    document.getElementById('t_rute').innerText = data.data.rute;
+                    document.getElementById('t_penerima').innerText = data.data.penerima;
+                    document.getElementById('t_posisi').innerText = `${data.data.posisi} (${data.data.waktu})`;
+                    let badge = document.getElementById('t_badge');
+                    badge.innerText = data.data.status;
+                    
+                    if(data.data.status === 'DELIVERED') badge.className = 'px-3 py-1 bg-green-500 text-white font-bold rounded-full text-sm shadow';
+                    else if(data.data.status === 'ON TRANSIT') badge.className = 'px-3 py-1 bg-blue-500 text-white font-bold rounded-full text-sm shadow';
+                    else badge.className = 'px-3 py-1 bg-yellow-500 text-white font-bold rounded-full text-sm shadow';
+                    
+                    document.getElementById('resultTrack').classList.remove('hidden');
+                } else alert(data.message);
+            } catch(e) { alert("Sistem tracking sedang sibuk, coba lagi."); }
+            
+            btn.innerText = "CEK RESI"; btn.disabled = false;
+        }
+
+        // --- UPDATE TRANSIT (KURIR) ---
+        async function updateResi() {
+            let resi = document.getElementById('i_resiUpdate').value.toUpperCase();
+            let status = document.getElementById('i_statusUpdate').value;
+            let btn = document.getElementById('btnUpdateResi');
+            
+            if(!resi) return alert("Nomor resi wajib diisi!");
+            
+            btn.innerText = "Memproses..."; btn.disabled = true;
+            
+            try {
+                let payload = {
+                    action: 'update_paket', resi: resi, status: status,
+                    posisi: userSesi.cabang, waktu: new Date().toLocaleString('id-ID')
+                };
+                let res = await fetch(API_URL, { 
+                    method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) 
+                });
+                let data = await res.json();
+                
+                if(data.success) {
+                    alert(`✅ Sukses! Resi ${resi} diupdate menjadi ${status} di ${userSesi.cabang}`);
+                    document.getElementById('i_resiUpdate').value = ""; // Clear input
+                } else alert(data.message);
+            } catch(e) { alert("Gagal update data!"); }
+            
+            btn.innerText = "UPDATE SYSTEM"; btn.disabled = false;
+        }
+
+        // --- LOGIKA FORM INPUT RESI (ADMIN) ---
         function cekAsuransi() {
             let kat = document.getElementById('i_kategori').value;
             let chk = document.getElementById('chk_asuransi');
-            if(kat === 'Elektronik') { chk.checked = true; chk.disabled = true; toggleHargaBarang(); }
-            else { chk.disabled = false; }
+            if(kat === 'Elektronik') { 
+                chk.checked = true; chk.disabled = true; 
+            } else { 
+                chk.disabled = false; 
+            }
+            toggleHargaBarang();
         }
 
         function toggleHargaBarang() {
-            let input = document.getElementById('i_hargaBarang');
-            if(document.getElementById('chk_asuransi').checked) input.classList.remove('hidden');
-            else { input.classList.add('hidden'); input.value = ''; }
+            let div = document.getElementById('div_hargaBarang');
+            if(document.getElementById('chk_asuransi').checked) {
+                div.classList.remove('hidden');
+            } else { 
+                div.classList.add('hidden'); document.getElementById('i_hargaBarang').value = ''; 
+            }
         }
 
         function togglePrepaid() {
             let bayar = document.getElementById('i_bayar').value;
-            document.getElementById('lbl_prepaid').classList.toggle('hidden', bayar === 'COD');
+            if(bayar === 'COD') {
+                document.getElementById('div_lunas').classList.add('hidden');
+                document.getElementById('chk_lunas').checked = false;
+            } else {
+                document.getElementById('div_lunas').classList.remove('hidden');
+            }
         }
 
         function kompresFoto(event) {
@@ -236,7 +423,7 @@
                     canvas.width = img.width * scale; canvas.height = img.height * scale;
                     let ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    fotoBase64Global = canvas.toDataURL('image/jpeg', 0.6); // Kompres 60%
+                    fotoBase64Global = canvas.toDataURL('image/jpeg', 0.6); // Kompres kualitas 60%
                 }
                 img.src = e.target.result;
             }
@@ -244,9 +431,19 @@
         }
 
         function lanjutStep2() {
-            if(!document.getElementById('i_pengirim').value || !fotoBase64Global) return alert("Lengkapi data & pastikan Foto terupload!");
+            if(!document.getElementById('i_pengirim').value || !document.getElementById('i_penerima').value || !document.getElementById('i_berat').value) {
+                return alert("Lengkapi data Nama dan Berat terlebih dahulu!");
+            }
+            if(!fotoBase64Global) {
+                return alert("Wajib melampirkan Foto Bukti Barang!");
+            }
             document.getElementById('step1').classList.add('hidden');
             document.getElementById('step2').classList.remove('hidden');
+        }
+
+        function kembaliStep1() {
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step1').classList.remove('hidden');
         }
 
         function hitungTotal() {
@@ -255,12 +452,13 @@
             let layanan = parseFloat(document.getElementById('i_layanan').value);
             let kat = document.getElementById('i_kategori').value;
             
-            // Cargo Min 10kg
-            if(layanan === 0.65 && berat < 10) { berat = 10; alert("Cargo hitungan minimal 10kg!"); }
-            
+            // Logika Cargo
+            if(layanan === 0.65 && berat < 10) { 
+                berat = 10; alert("Perhatian: Layanan Cargo otomatis dihitung batas minimal 10 Kg!"); 
+            }
             let ongkir = base * berat * layanan;
             
-            // Volume Oversize
+            // Logika Volume Oversize
             let p = document.getElementById('i_p').value || 0;
             let l = document.getElementById('i_l').value || 0;
             let t = document.getElementById('i_t').value || 0;
@@ -268,78 +466,108 @@
             let biayaVolume = 0;
             if(vol > 40000) biayaVolume = Math.ceil((vol - 40000) / 250) * 1500;
 
-            // Kategori Surcharge
-            let biayaKategori = (kat==='Pecah Belah')?5000 : (kat==='Elektronik')?10000 : (kat==='Makanan')?3000 : 0;
+            // Logika Kategori (Surcharge)
+            let biayaKategori = (kat==='Pecah Belah') ? 5000 : (kat==='Elektronik') ? 10000 : (kat==='Makanan') ? 3000 : 0;
             
-            // Asuransi & COD
-            let asuransi = document.getElementById('chk_asuransi').checked ? (parseFloat(document.getElementById('i_hargaBarang').value||0) * 0.005) : 0;
+            // Logika Asuransi & COD
+            let hgBarang = parseFloat(document.getElementById('i_hargaBarang').value) || 0;
+            let asuransi = document.getElementById('chk_asuransi').checked ? (hgBarang * 0.005) : 0;
             let cod = document.getElementById('i_bayar').value === 'COD' ? 5000 : 0;
 
             hitunganOngkir = ongkir + biayaVolume + biayaKategori + asuransi + cod;
             
-            let rincian = document.getElementById('rincianBiaya');
-            rincian.innerHTML = `Ongkir Dasar: Rp${ongkir}<br>Biaya Oversize: Rp${biayaVolume}<br>Surcharge Kat: Rp${biayaKategori}<br>Asuransi: Rp${asuransi}<br>COD Fee: Rp${cod}<br><br><b>TOTAL: Rp${hitunganOngkir}</b>`;
-            rincian.classList.remove('hidden');
+            // Format Rupiah Tampilan
+            const rp = (angka) => 'Rp ' + angka.toLocaleString('id-ID');
+            
+            let htmlRincian = `
+                <p class="mb-1">Ongkos Kirim Dasar: <b>${rp(ongkir)}</b></p>
+                <p class="mb-1 text-gray-500">Biaya Oversize Volume: ${rp(biayaVolume)}</p>
+                <p class="mb-1 text-gray-500">Handling Kategori (${kat}): ${rp(biayaKategori)}</p>
+                <p class="mb-1 text-gray-500">Premi Asuransi (0.5%): ${rp(asuransi)}</p>
+                <p class="mb-3 text-gray-500">Surcharge COD: ${rp(cod)}</p>
+                <p class="text-lg font-black border-t-2 border-yellow-500 pt-2">TOTAL: ${rp(hitunganOngkir)}</p>
+            `;
+            
+            document.getElementById('rincianBiaya').innerHTML = htmlRincian;
+            document.getElementById('rincianBiaya').classList.remove('hidden');
         }
 
         async function prosesResi() {
-            if(document.getElementById('i_bayar').value === 'PREPAID' && !document.getElementById('chk_lunas').checked) {
-                return alert("Centang konfirmasi penerimaan uang dulu bosku!");
+            let bayar = document.getElementById('i_bayar').value;
+            
+            if(bayar === 'PREPAID' && !document.getElementById('chk_lunas').checked) {
+                return alert("Anda harus mencentang konfirmasi penerimaan uang PREPAID!");
+            }
+            if(hitunganOngkir === 0) {
+                return alert("Silakan klik tombol 'HITUNG TOTAL ONGKIR' terlebih dahulu!");
             }
             
             let btn = document.getElementById('btnProsesResi');
-            btn.innerText = "Mengupload Data & Foto... Mohon tunggu!";
+            btn.innerText = "MENGUPLOAD DATA... JANGAN TUTUP HALAMAN";
             btn.disabled = true;
 
-            let resiBaru = "LAJU-" + new Date().getTime();
-            let bayar = document.getElementById('i_bayar').value;
+            let resiBaru = "LAJU-" + new Date().getTime(); // Generate Unik
+            
+            let e_layanan = document.getElementById('i_layanan');
+            let namaLayanan = e_layanan.options[e_layanan.selectedIndex].text.split('(')[0].trim();
+
+            let e_zona = document.getElementById('i_zona');
+            let namaZona = e_zona.options[e_zona.selectedIndex].text.split('(')[0].trim();
 
             let payload = {
-                action: 'add_paket', resi: resiBaru,
-                pengirim: document.getElementById('i_pengirim').value, penerima: document.getElementById('i_penerima').value,
-                tujuan: document.getElementById('i_zona').options[document.getElementById('i_zona').selectedIndex].text,
-                berat: document.getElementById('i_berat').value, totalOngkir: hitunganOngkir,
-                posisi: userSesi.cabang, waktu: new Date().toLocaleString('id-ID'),
-                fotoBase64: fotoBase64Global, metodeBayar: bayar, statusBayar: bayar === 'COD' ? 'PENDING COD' : 'LUNAS'
+                action: 'add_paket', 
+                resi: resiBaru,
+                pengirim: document.getElementById('i_pengirim').value, 
+                penerima: document.getElementById('i_penerima').value,
+                tujuan: namaZona,
+                berat: document.getElementById('i_berat').value, 
+                totalOngkir: hitunganOngkir,
+                posisi: userSesi.cabang, 
+                waktu: new Date().toLocaleString('id-ID'),
+                fotoBase64: fotoBase64Global, 
+                metodeBayar: bayar, 
+                statusBayar: bayar === 'COD' ? 'PENDING COD' : 'LUNAS'
             };
 
             try {
-                let res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+                let res = await fetch(API_URL, { 
+                    method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) 
+                });
                 let data = await res.json();
+                
                 if(data.success) {
-                    // Siapkan Tampilan Cetak
-                    document.getElementById('p_pengirim').innerText = payload.pengirim;
-                    document.getElementById('p_penerima').innerText = payload.penerima;
-                    document.getElementById('p_layanan').innerText = document.getElementById('i_layanan').options[document.getElementById('i_layanan').selectedIndex].text;
+                    // Siapkan Tampilan Cetak Resi
+                    document.getElementById('p_resiText').innerText = resiBaru;
+                    document.getElementById('p_pengirim').innerText = payload.pengirim.toUpperCase();
+                    document.getElementById('p_penerima').innerText = payload.penerima.toUpperCase();
+                    document.getElementById('p_layanan').innerText = namaLayanan;
                     document.getElementById('p_berat').innerText = payload.berat;
                     
+                    let containerTagih = document.getElementById('p_tagih_container');
                     let tagih = document.getElementById('p_tagih');
-                    if(bayar === 'COD') { tagih.innerText = "WAJIB TAGIH: Rp " + hitunganOngkir; tagih.className = "text-center text-2xl font-black mt-6 border-4 border-black py-2 bg-yellow-300"; }
-                    else { tagih.innerText = "LUNAS / NON-COD"; tagih.className = "text-center text-xl font-bold mt-6 py-2"; }
                     
-                    JsBarcode("#barcode", resiBaru, {format: "CODE128", width: 2, height: 50});
+                    if(bayar === 'COD') { 
+                        document.getElementById('p_tagih_label').innerText = "WAJIB TAGIH PENERIMA (COD)";
+                        tagih.innerText = "Rp " + hitunganOngkir.toLocaleString('id-ID'); 
+                        containerTagih.className = "text-center p-3 border-4 border-black mt-4 bg-gray-200"; 
+                    } else { 
+                        document.getElementById('p_tagih_label').innerText = "STATUS PEMBAYARAN";
+                        tagih.innerText = "LUNAS (NON-COD)"; 
+                        containerTagih.className = "text-center p-2 border-2 border-black mt-4"; 
+                    }
+                    
+                    // Generate Barcode SVG
+                    JsBarcode("#barcode", resiBaru, {
+                        format: "CODE128", width: 2.5, height: 60, displayValue: false
+                    });
                     
                     document.getElementById('dashboardPage').classList.add('hidden');
                     document.getElementById('formInput').classList.add('hidden');
                     document.getElementById('printArea').classList.remove('hidden');
-                }
-            } catch(e) { alert("Gagal proses resi."); btn.disabled = false; btn.innerText = "PROSES RESI & CETAK"; }
-        }
-
-        // --- PUBLIC TRACKING ---
-        async function cekResi() {
-            let resi = document.getElementById('resiTrack').value;
-            let res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'lacak', resi: resi }) });
-            let data = await res.json();
-            if(data.success) {
-                document.getElementById('t_rute').innerText = data.data.rute;
-                document.getElementById('t_penerima').innerText = data.data.penerima;
-                document.getElementById('t_posisi').innerText = `${data.data.posisi} (${data.data.waktu})`;
-                let badge = document.getElementById('t_badge');
-                badge.innerText = data.data.status;
-                badge.className = data.data.status === 'DELIVERED' ? 'px-3 py-1 bg-green-500 text-white font-bold rounded' : 'px-3 py-1 bg-yellow-500 text-white font-bold rounded';
-                document.getElementById('resultTrack').classList.remove('hidden');
-            } else alert(data.message);
+                } else alert(data.message);
+            } catch(e) { alert("Sistem Gagal Memproses Resi. Cek Koneksi."); }
+            
+            btn.innerText = "PROSES RESI SEKARANG"; btn.disabled = false;
         }
     </script>
 </body>
