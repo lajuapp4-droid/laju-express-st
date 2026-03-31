@@ -6,7 +6,7 @@ from datetime import datetime
 st.set_page_config(page_title="Laju Express", page_icon="📦", layout="centered")
 
 # === PASTE URL WEB APP DARI GOOGLE APPS SCRIPT DI SINI ===
-API_URL = "https://script.google.com/macros/s/AKfycbzhKIB9Q-uz7lskLktJFNRNgCjzlUbghZtVaB2b4O_NXbUz89TDSGRIV2NvySmze6eSKQ/exec"
+API_URL = "https://script.google.com/macros/s/AKfycbyA1EJpnyq-5cruPekt8wVfSqdnfFVoswH4tiCyxPszeYDWFfB56xFfOnzZT1JRM2AK4Q/exec"
 
 # === SESSION STATE ===
 if 'logged_in' not in st.session_state:
